@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Merchant, type: :model do
   # before(:each) do
-
+  #   create(:merchant)
+  #   require 'pry'; binding.pry
   # end
 
   describe 'relationships' do
