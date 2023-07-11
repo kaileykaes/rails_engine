@@ -53,8 +53,8 @@ RSpec.describe 'Items endpoints' do
 
       items = JSON.parse(response.body, symbolize_names: true)
 
-      expect(merchants.count).to eq(0)
-      expect(merchants.class).to be_an Array
+      expect(items.count).to eq(0)
+      expect(items.class).to be_an Array
     end
   end
 end
