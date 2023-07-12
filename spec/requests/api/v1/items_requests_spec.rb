@@ -57,4 +57,17 @@ RSpec.describe 'Items endpoints' do
       expect(items.class).to be_an Array
     end
   end
+
+  describe 'show' do 
+    it 'sends a specific item' do 
+      item = create(:item, merchant: @merchant)
+
+      get "/api/v1/items/#{item.id}"
+      the_item = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to be_successful
+      expect(the_item[:id]).to eq(item.id)
+      expect(the_item[:name]).to eq(item.name)
+    end
+  end
 end
