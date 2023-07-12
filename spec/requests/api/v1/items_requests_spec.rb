@@ -32,8 +32,17 @@ RSpec.describe 'Items endpoints' do
         expect(item).to have_key(:attributes)
         expect(item[:attributes]).to be_a Hash
 
-        expect(item[:attributes]).to have_key(:name)
-        expect(item[:attributes][:name]).to be_a String
+        
+        attributes = item[:attributes]
+
+        expect(attributes).to have_key(:unit_price)
+        expect(attributes[:unit_price]).to be_a Float
+        
+        keys = [:name, :description]
+        keys.each do |key|
+          expect(attributes).to have_key(key)
+          expect(attributes[key]).to be_a String
+        end
       end
     end
 
@@ -63,20 +72,27 @@ RSpec.describe 'Items endpoints' do
       expect(json[:data]).to be_a Array
       expect(json[:data].count).to eq(1)
 
-      item = json[:data].first
+      one_item = json[:data].first
 
-      expect(item).to have_key(:id)
-      expect(item[:id]).to be_a String
+      expect(one_item).to have_key(:id)
+      expect(one_item[:id]).to be_a String
 
-      expect(item).to have_key(:type)
-      expect(item[:type]).to be_a String
-      expect(item[:type]).to eq('item')
+      expect(one_item).to have_key(:type)
+      expect(one_item[:type]).to be_a String
+      expect(one_item[:type]).to eq('item')
 
-      expect(item).to have_key(:attributes)
-      expect(item[:attributes]).to be_a Hash
+      expect(one_item).to have_key(:attributes)
+      expect(one_item[:attributes]).to be_a Hash
 
-      expect(item[:attributes]).to have_key(:name)
-      expect(item[:attributes][:name]).to be_a String
+      attributes = one_item[:attributes]
+      keys = [:name, :description]
+      keys.each do |key|
+        expect(attributes).to have_key(key)
+        expect(attributes[key]).to be_a String
+      end
+
+      expect(attributes).to have_key(:unit_price)
+      expect(attributes[:unit_price]).to be_a Float
     end
   end
 
@@ -91,47 +107,19 @@ RSpec.describe 'Items endpoints' do
       expect(json).to have_key(:data)
       expect(json[:data]).to be_a Hash
 
-      item = json[:data]
+      show_item = json[:data]
 
-      expect(item).to have_key(:id)
-      expect(item[:id]).to be_a String
+      expect(show_item).to have_key(:id)
+      expect(show_item[:id]).to be_a String
 
-      expect(item).to have_key(:type)
-      expect(item[:type]).to be_a String
-      expect(item[:type]).to eq('item')
+      expect(show_item).to have_key(:type)
+      expect(show_item[:type]).to be_a String
+      expect(show_item[:type]).to eq('item')
 
-      expect(item).to have_key(:attributes)
-      expect(item[:attributes]).to be_a Hash
+      expect(show_item).to have_key(:attributes)
+      expect(show_item[:attributes]).to be_a Hash
 
-      expect(item[:attributes]).to have_key(:name)
-      expect(item[:attributes][:name]).to be_a String
-    end
-  end
-
-  describe 'show' do 
-    it 'sends a specific item' do 
-      item = create(:item, merchant: @merchant)
-
-      get "/api/v1/items/#{item.id}"
-      json = JSON.parse(response.body, symbolize_names: true)
-
-      expect(json).to be_a Hash
-      expect(json).to have_key(:data)
-      expect(json[:data]).to be_a Hash
-
-      the_item = json[:data]
-
-      expect(the_item).to have_key(:id)
-      expect(the_item[:id]).to be_a String
-
-      expect(the_item).to have_key(:type)
-      expect(the_item[:type]).to be_a String
-      expect(the_item[:type]).to eq('item')
-
-      expect(the_item).to have_key(:attributes)
-      expect(the_item[:attributes]).to be_a Hash
-
-      attributes = the_item[:attributes]
+      attributes = show_item[:attributes]
       keys = [:name, :description]
       keys.each do |key|
         expect(attributes).to have_key(key)
