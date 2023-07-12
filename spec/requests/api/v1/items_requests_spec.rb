@@ -63,7 +63,7 @@ RSpec.describe 'Items endpoints' do
       item = create(:item, merchant: @merchant)
 
       get "/api/v1/items/#{item.id}"
-      the_item = JSON.parse(response.body, symbolize_names: true)
+      thet_item = JSON.parse(response.body, symbolize_names: true)
 
       expect(response).to be_successful
       expect(the_item[:id]).to eq(item.id)
