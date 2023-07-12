@@ -5,23 +5,47 @@ RSpec.describe 'Items endpoints' do
     @merchant = create(:merchant)
   end
 
-  describe 'relationships' do
+  describe 'index' do 
     it 'sends a list of all items' do
       create_list(:item, 4, merchant: @merchant)
       get '/api/v1/items'
 
       expect(response).to be_successful 
 
-      items = JSON.parse(response.body, symbolize_names: true)
+      json = JSON.parse(response.body, symbolize_names: true)
 
-      expect(items.count).to eq(4)
+      expect(json).to be_a Hash
+      expect(json).to have_key(:data)
+      expect(json[:data]).to be_a Array
+      expect(json[:data].count).to eq(4)
+
+      items = json[:data]
 
       items.each do |item|
         expect(item).to have_key(:id)
-        expect(item[:id]).to be_an Integer
+        expect(item[:id]).to be_a String
 
-        expect(item).to have_key(:name)
-        expect(item[:name]).to be_a String
+        expect(item).to have_key(:type)
+        expect(item[:type]).to be_a String
+        expect(item[:type]).to eq('item')
+
+        expect(item).to have_key(:attributes)
+        expect(item[:attributes]).to be_a Hash
+
+        
+        attributes = item[:attributes]
+
+        expect(attributes).to have_key(:unit_price)
+        expect(attributes[:unit_price]).to be_a Float
+
+        expect(attributes).to have_key(:merchant_id)
+        expect(attributes[:merchant_id]).to be_a Integer
+        
+        keys = [:name, :description]
+        keys.each do |key|
+          expect(attributes).to have_key(key)
+          expect(attributes[key]).to be_a String
+        end
       end
     end
 
@@ -29,10 +53,13 @@ RSpec.describe 'Items endpoints' do
       get '/api/v1/items'
       expect(response).to be_successful
 
-      items = JSON.parse(response.body, symbolize_names: true)
+      json = JSON.parse(response.body, symbolize_names: true)
 
-      expect(items.count).to eq(0)
-      expect(items.class).to be_an Array
+      expect(json).to be_a Hash
+      expect(json).to have_key(:data)
+      expect(json[:data]).to be_a Array
+      expect(json[:data].count).to eq(0)
+      expect(json[:data].empty?).to be true
     end
 
     it 'sends an array if one piece data' do 
@@ -41,20 +68,37 @@ RSpec.describe 'Items endpoints' do
 
       expect(response).to be_successful
 
-      items = JSON.parse(response.body, symbolize_names: true)
+      json = JSON.parse(response.body, symbolize_names: true)
 
-      expect(items.count).to eq(1)
-      expect(items.class).to be_an Array
-    end
+      expect(json).to be_a Hash
+      expect(json).to have_key(:data)
+      expect(json[:data]).to be_a Array
+      expect(json[:data].count).to eq(1)
 
-    it 'sends an empty array if no data' do 
-      get '/api/v1/items'
-      expect(response).to be_successful
+      one_item = json[:data].first
 
-      items = JSON.parse(response.body, symbolize_names: true)
+      expect(one_item).to have_key(:id)
+      expect(one_item[:id]).to be_a String
 
-      expect(items.count).to eq(0)
-      expect(items.class).to be_an Array
+      expect(one_item).to have_key(:type)
+      expect(one_item[:type]).to be_a String
+      expect(one_item[:type]).to eq('item')
+
+      expect(one_item).to have_key(:attributes)
+      expect(one_item[:attributes]).to be_a Hash
+
+      attributes = one_item[:attributes]
+      keys = [:name, :description]
+      keys.each do |key|
+        expect(attributes).to have_key(key)
+        expect(attributes[key]).to be_a String
+      end
+
+      expect(attributes).to have_key(:unit_price)
+      expect(attributes[:unit_price]).to be_a Float
+
+      expect(attributes).to have_key(:merchant_id)
+      expect(attributes[:merchant_id]).to be_a Integer
     end
   end
 
@@ -63,11 +107,38 @@ RSpec.describe 'Items endpoints' do
       item = create(:item, merchant: @merchant)
 
       get "/api/v1/items/#{item.id}"
-      thet_item = JSON.parse(response.body, symbolize_names: true)
+      json = JSON.parse(response.body, symbolize_names: true)
 
-      expect(response).to be_successful
-      expect(the_item[:id]).to eq(item.id)
-      expect(the_item[:name]).to eq(item.name)
+      expect(json).to be_a Hash
+      expect(json).to have_key(:data)
+      expect(json[:data]).to be_a Hash
+
+      show_item = json[:data]
+
+      expect(show_item).to have_key(:id)
+      expect(show_item[:id]).to be_a String
+
+      expect(show_item).to have_key(:type)
+      expect(show_item[:type]).to be_a String
+      expect(show_item[:type]).to eq('item')
+
+      expect(show_item).to have_key(:attributes)
+      expect(show_item[:attributes]).to be_a Hash
+
+      attributes = show_item[:attributes]
+      keys = [:name, :description]
+      keys.each do |key|
+        expect(attributes).to have_key(key)
+        expect(attributes[key]).to be_a String
+      end
+
+      expect(attributes).to have_key(:unit_price)
+      expect(attributes[:unit_price]).to be_a Float
+
+      expect(attributes).to have_key(:merchant_id)
+        expect(attributes[:merchant_id]).to be_a Integer
     end
+
+    it 'bad integer returns 404'
   end
 end

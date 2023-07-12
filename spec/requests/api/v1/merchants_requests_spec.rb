@@ -1,10 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Merchants API' do
-  # before(:each) do
-    
-  # end
-
   describe 'merchants endpoints' do
     describe 'index' do 
       it 'sends a list of all merchants' do
@@ -13,16 +9,28 @@ RSpec.describe 'Merchants API' do
 
         expect(response).to be_successful 
 
-        merchants = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
-        expect(merchants.count).to eq(4)
+        expect(json).to be_a Hash
+        expect(json).to have_key(:data)
+        expect(json[:data]).to be_a Array
+        expect(json[:data].count).to eq(4)
+
+        merchants = json[:data]
 
         merchants.each do |merchant|
           expect(merchant).to have_key(:id)
-          expect(merchant[:id]).to be_an Integer
+          expect(merchant[:id]).to be_a String
 
-          expect(merchant).to have_key(:name)
-          expect(merchant[:name]).to be_a String
+          expect(merchant).to have_key(:type)
+          expect(merchant[:type]).to be_a String
+          expect(merchant[:type]).to eq('merchant')
+
+          expect(merchant).to have_key(:attributes)
+          expect(merchant[:attributes]).to be_a Hash
+
+          expect(merchant[:attributes]).to have_key(:name)
+          expect(merchant[:attributes][:name]).to be_a String
         end
       end
 
@@ -30,10 +38,13 @@ RSpec.describe 'Merchants API' do
         get '/api/v1/merchants'
         expect(response).to be_successful
 
-        merchants = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
-        expect(merchants.count).to eq(0)
-        expect(merchants.class).to be_an Array
+        expect(json).to be_a Hash
+        expect(json).to have_key(:data)
+        expect(json[:data]).to be_a Array
+        expect(json[:data].count).to eq(0)
+        expect(json[:data].empty?).to be true
       end
 
       it 'sends an array if one piece data' do 
@@ -42,20 +53,27 @@ RSpec.describe 'Merchants API' do
 
         expect(response).to be_successful
 
-        merchants = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
-        expect(merchants.count).to eq(1)
-        expect(merchants.class).to be_an Array
-      end
+        expect(json).to be_a Hash
+        expect(json).to have_key(:data)
+        expect(json[:data]).to be_a Array
+        expect(json[:data].count).to eq(1)
 
-      it 'sends an array if no data' do 
-        get '/api/v1/merchants'
-        expect(response).to be_successful
+        merchant = json[:data].first
 
-        merchants = JSON.parse(response.body, symbolize_names: true)
+        expect(merchant).to have_key(:id)
+        expect(merchant[:id]).to be_a String
 
-        expect(merchants.count).to eq(0)
-        expect(merchants.class).to be_an Array
+        expect(merchant).to have_key(:type)
+        expect(merchant[:type]).to be_a String
+        expect(merchant[:type]).to eq('merchant')
+
+        expect(merchant).to have_key(:attributes)
+        expect(merchant[:attributes]).to be_a Hash
+
+        expect(merchant[:attributes]).to have_key(:name)
+        expect(merchant[:attributes][:name]).to be_a String
       end
     end
 
@@ -64,12 +82,29 @@ RSpec.describe 'Merchants API' do
         merchant = create(:merchant)
 
         get "/api/v1/merchants/#{merchant.id}"
-        the_merchant = JSON.parse(response.body, symbolize_names: true)
+        json = JSON.parse(response.body, symbolize_names: true)
 
-        expect(response).to be_successful
-        expect(the_merchant[:id]).to eq(merchant.id)
-        expect(the_merchant[:name]).to eq(merchant.name)
+        expect(json).to be_a Hash
+        expect(json).to have_key(:data)
+        expect(json[:data]).to be_a Hash
+
+        merchant = json[:data]
+
+        expect(merchant).to have_key(:id)
+        expect(merchant[:id]).to be_a String
+
+        expect(merchant).to have_key(:type)
+        expect(merchant[:type]).to be_a String
+        expect(merchant[:type]).to eq('merchant')
+
+        expect(merchant).to have_key(:attributes)
+        expect(merchant[:attributes]).to be_a Hash
+
+        expect(merchant[:attributes]).to have_key(:name)
+        expect(merchant[:attributes][:name]).to be_a String
       end
+
+      it 'bad integer returns 404'
     end
   end
 end
