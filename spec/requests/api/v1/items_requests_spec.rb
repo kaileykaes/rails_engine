@@ -109,30 +109,37 @@ RSpec.describe 'Items endpoints' do
   end
 
   describe 'show' do 
-    it 'sends a specific merchant' do 
-      merchant = create(:merchant)
+    it 'sends a specific item' do 
+      item = create(:item, merchant: @merchant)
 
-      get "/api/v1/merchants/#{merchant.id}"
+      get "/api/v1/items/#{item.id}"
       json = JSON.parse(response.body, symbolize_names: true)
 
       expect(json).to be_a Hash
       expect(json).to have_key(:data)
       expect(json[:data]).to be_a Hash
 
-      merchant = json[:data]
+      the_item = json[:data]
 
-      expect(merchant).to have_key(:id)
-      expect(merchant[:id]).to be_a String
+      expect(the_item).to have_key(:id)
+      expect(the_item[:id]).to be_a String
 
-      expect(merchant).to have_key(:type)
-      expect(merchant[:type]).to be_a String
-      expect(merchant[:type]).to eq('merchant')
+      expect(the_item).to have_key(:type)
+      expect(the_item[:type]).to be_a String
+      expect(the_item[:type]).to eq('item')
 
-      expect(merchant).to have_key(:attributes)
-      expect(merchant[:attributes]).to be_a Hash
+      expect(the_item).to have_key(:attributes)
+      expect(the_item[:attributes]).to be_a Hash
 
-      expect(merchant[:attributes]).to have_key(:name)
-      expect(merchant[:attributes][:name]).to be_a String
+      attributes = the_item[:attributes]
+      keys = [:name, :description]
+      keys.each do |key|
+        expect(attributes).to have_key(key)
+        expect(attributes[key]).to be_a String
+      end
+
+      expect(attributes).to have_key(:unit_price)
+      expect(attributes[:unit_price]).to be_a Float
     end
   end
 end
