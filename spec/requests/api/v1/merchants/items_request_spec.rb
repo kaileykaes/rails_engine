@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Merchant Items' do
   before(:each) do
-    @merchant = create(:merchant)
+    @merchant = create(:merchant, id: 3)
     @items = create_list(:item, 7, merchant: @merchant)
   end
 
@@ -45,8 +45,11 @@ RSpec.describe 'Merchant Items' do
           expect(attributes[key]).to be_a String
         end
       end
+    end
 
-      it 'bad integer id returns 404'
+    xit 'bad integer id returns 404' do 
+      get '/api/v1/merchants/2/items' 
+      expect(response).to_not be_successful
     end
   end
 end
