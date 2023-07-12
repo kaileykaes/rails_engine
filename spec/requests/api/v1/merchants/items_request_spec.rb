@@ -45,6 +45,8 @@ RSpec.describe 'Merchant Items' do
           expect(attributes[key]).to be_a String
         end
       end
+
+      it 'bad integer id returns 404'
     end
   end
 end
