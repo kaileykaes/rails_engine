@@ -103,6 +103,8 @@ RSpec.describe 'Merchants API' do
         expect(merchant[:attributes]).to have_key(:name)
         expect(merchant[:attributes][:name]).to be_a String
       end
+
+      it 'bad integer returns 404'
     end
   end
 end

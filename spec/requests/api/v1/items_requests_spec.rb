@@ -37,6 +37,9 @@ RSpec.describe 'Items endpoints' do
 
         expect(attributes).to have_key(:unit_price)
         expect(attributes[:unit_price]).to be_a Float
+
+        expect(attributes).to have_key(:merchant_id)
+        expect(attributes[:merchant_id]).to be_a Integer
         
         keys = [:name, :description]
         keys.each do |key|
@@ -93,6 +96,9 @@ RSpec.describe 'Items endpoints' do
 
       expect(attributes).to have_key(:unit_price)
       expect(attributes[:unit_price]).to be_a Float
+
+      expect(attributes).to have_key(:merchant_id)
+      expect(attributes[:merchant_id]).to be_a Integer
     end
   end
 
@@ -128,6 +134,11 @@ RSpec.describe 'Items endpoints' do
 
       expect(attributes).to have_key(:unit_price)
       expect(attributes[:unit_price]).to be_a Float
+
+      expect(attributes).to have_key(:merchant_id)
+        expect(attributes[:merchant_id]).to be_a Integer
     end
+
+    it 'bad integer returns 404'
   end
 end
