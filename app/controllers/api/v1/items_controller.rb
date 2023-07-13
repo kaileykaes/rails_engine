@@ -27,10 +27,13 @@ class Api::V1::ItemsController < ApplicationController
         item.invoices.each do |invoice|
           Invoice.destroy(invoice.id)
         end
+        item.destroy
       else
+        item.destroy
         item.invoice_items.each do |invoice_item|
           InvoiceItem.destroy(invoice_item.id)
         end   
+        item.destroy
       end
     end
   end
