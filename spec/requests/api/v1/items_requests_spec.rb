@@ -249,8 +249,10 @@ RSpec.describe 'Items endpoints' do
       invoice_item = create(:invoice_item, invoice: invoice, item: item)
       delete "/api/v1/items/#{item.id}"
 
-      expect(invoice).to eq(nil)
-      expect(invoice_item).to eq(nil)
+      expect(Item.count).to eq(0)
+      expect(InvoiceItem.count).to eq(0)
+      expect(Invoice.count).to eq(0)
+      expect(Invoice.all).to_not include(invoice)
     end
 
     it 'no delete invoice if invoice had other items' do 
@@ -262,13 +264,16 @@ RSpec.describe 'Items endpoints' do
       invoice_item_2 = create(:invoice_item, invoice: invoice, item: item_2)
       expect(Item.count).to eq(2)
       expect(InvoiceItem.count).to eq(2)
+      expect(Invoice.count).to eq(1)
       expect(invoice.invoice_items.count).to eq(2)
       expect(invoice.invoice_items.include?(invoice_item)).to be true
-      delete "/api/v1/items/#{item.id}"
 
+      delete "/api/v1/items/#{item.id}"
+      
       expect(invoice.invoice_items.count).to eq(1)
       expect(invoice.invoice_items.include?(invoice_item)).to be false
       expect(InvoiceItem.count).to eq(1)
+      expect(Invoice.count).to eq(1)
       expect(Item.count).to eq(1)
     end
   end
