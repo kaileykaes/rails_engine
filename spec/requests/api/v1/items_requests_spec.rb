@@ -224,5 +224,57 @@ RSpec.describe 'Items endpoints' do
       item = Item.first
       expect{ delete "/api/v1/items/#{item.id}" }.to change(Item, :count).by(-1)
     end
+
+    it 'does not return json' do 
+      id = create(:item, merchant: @merchant).id
+      delete "/api/v1/items/#{id}"
+
+      expect(response).to be_successful
+      expect(response.body).to be_empty
+      expect(response.status).to eq(204)
+    end
+
+    it 'does return 204 status code' do 
+      id = create(:item, merchant: @merchant).id
+      delete "/api/v1/items/#{id}"
+
+      expect(response).to be_successful
+      expect(response.status).to eq(204)
+    end
+
+    it 'deletes invoice if invoice only had item' do 
+      customer = create(:customer)
+      item = create(:item, merchant: @merchant)
+      invoice = create(:invoice, merchant: @merchant, customer: customer)
+      invoice_item = create(:invoice_item, invoice: invoice, item: item)
+      delete "/api/v1/items/#{item.id}"
+
+      expect(Item.count).to eq(0)
+      expect(InvoiceItem.count).to eq(0)
+      expect(Invoice.count).to eq(0)
+      expect(Invoice.all).to_not include(invoice)
+    end
+
+    it 'no delete invoice if invoice had other items' do 
+      customer = create(:customer)
+      item = create(:item, merchant: @merchant)
+      item_2 = create(:item, merchant: @merchant)
+      invoice = create(:invoice, merchant: @merchant, customer: customer)
+      invoice_item = create(:invoice_item, invoice: invoice, item: item)
+      invoice_item_2 = create(:invoice_item, invoice: invoice, item: item_2)
+      expect(Item.count).to eq(2)
+      expect(InvoiceItem.count).to eq(2)
+      expect(Invoice.count).to eq(1)
+      expect(invoice.invoice_items.count).to eq(2)
+      expect(invoice.invoice_items.include?(invoice_item)).to be true
+
+      delete "/api/v1/items/#{item.id}"
+      
+      expect(invoice.invoice_items.count).to eq(1)
+      expect(invoice.invoice_items.include?(invoice_item)).to be false
+      expect(InvoiceItem.count).to eq(1)
+      expect(Invoice.count).to eq(1)
+      expect(Item.count).to eq(1)
+    end
   end
 end
