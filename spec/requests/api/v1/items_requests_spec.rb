@@ -136,9 +136,28 @@ RSpec.describe 'Items endpoints' do
       expect(attributes[:unit_price]).to be_a Float
 
       expect(attributes).to have_key(:merchant_id)
-        expect(attributes[:merchant_id]).to be_a Integer
+      expect(attributes[:merchant_id]).to be_a Integer
     end
 
     it 'bad integer returns 404'
+  end
+
+  describe 'create' do 
+    it 'can create an item' do 
+      item_params = ({
+        name: "O'Keeffe's Working Hands", 
+        description: 'intensive hand cream/lotion', 
+        unit_price: 3.90, 
+        merchant_id: @merchant.id
+      })
+      headers = {"CONTENT_TYPE" => "application/json"}
+
+      post "/api/v1/items"
+
+      created_item = Item.last
+
+      expect(response).to be_successful
+      require 'pry'; binding.pry
+    end
   end
 end
