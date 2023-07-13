@@ -241,5 +241,32 @@ RSpec.describe 'Items endpoints' do
       expect(response).to be_successful
       expect(response.status).to eq(204)
     end
+
+    it 'deletes invoice if invoice only had item' do 
+      customer = create(:customer)
+      item = create(:item, merchant: @merchant)
+      invoice = create(:invoice, merchant: @merchant, customer: customer)
+      invoice_item = create(:invoice_item, invoice: invoice, item: item)
+      delete "/api/v1/items/#{item.id}"
+
+      expect(invoice).to eq(nil)
+      expect(invoice_item).to eq(nil)
+    end
+
+    it 'no delete invoice if invoice had other items' do 
+      customer = create(:customer)
+      item = create(:item, merchant: @merchant)
+      item_2 = create(:item, merchant: @merchant)
+      invoice = create(:invoice, merchant: @merchant, customer: customer)
+      invoice_item = create(:invoice_item, invoice: invoice, item: item)
+      invoice_item_2 = create(:invoice_item, invoice: invoice, item: item_2)
+      expect(Item.count).to eq(2)
+
+      delete "/api/v1/items/#{item.id}"
+      
+      # expect(invoice).to eq(invoice)
+      # expect(invoice_item).to eq(nil)
+      expect(Item.count).to eq(1)
+    end
   end
 end
