@@ -36,5 +36,7 @@ RSpec.describe 'Item Merchant' do
       get '/api/v1/items/2/merchant' 
       expect(response).to_not be_successful
     end
+
+    it 'edge case, string id returns 404'
   end
 end
