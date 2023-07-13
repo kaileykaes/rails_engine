@@ -224,5 +224,22 @@ RSpec.describe 'Items endpoints' do
       item = Item.first
       expect{ delete "/api/v1/items/#{item.id}" }.to change(Item, :count).by(-1)
     end
+
+    it 'does not return json' do 
+      id = create(:item, merchant: @merchant).id
+      delete "/api/v1/items/#{id}"
+
+      expect(response).to be_successful
+      expect(response.body).to be_empty
+      expect(response.status).to eq(204)
+    end
+
+    it 'does return 204 status code' do 
+      id = create(:item, merchant: @merchant).id
+      delete "/api/v1/items/#{id}"
+
+      expect(response).to be_successful
+      expect(response.status).to eq(204)
+    end
   end
 end
