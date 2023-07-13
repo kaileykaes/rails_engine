@@ -16,7 +16,23 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def destroy
-    Item.destroy(params[:id])
+    item = Item.find(params[:id])
+    begin
+      item.destroy
+    rescue ActiveRecord::InvalidForeignKey => e
+      if item.invoices.count == 1
+        item.invoice_items.each do |invoice_item|
+          InvoiceItem.destroy(invoice_item.id)
+        end
+        item.invoices.each do |invoice|
+          Invoice.destroy(invoice.id)
+        end
+      else
+        item.invoice_items.each do |invoice_item|
+          InvoiceItem.destroy(invoice_item.id)
+        end   
+      end
+    end
   end
 
   private
