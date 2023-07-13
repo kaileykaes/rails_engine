@@ -6,11 +6,11 @@ RSpec.describe 'Find a Merchant' do
   end
 
   describe 'search for a merchant' do
-    it 'returns a merchant by query' do 
+    it 'returns a single object, if found' do 
       query_params = {
         name: 'ru'
       }
-      get '/api/v1/find', params: query_params
+      get '/api/v1/merchants/find', params: query_params
 
       expect(response).to be_successful
     end
