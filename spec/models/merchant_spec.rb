@@ -24,8 +24,8 @@ RSpec.describe Merchant, type: :model do
     end
 
     it 'find_it returns in case_insensitive alphabetical order' do 
-      merchant = create(:merchant, name: 'Ring World')
       merchant_2 = create(:merchant, name: 'Turing')
+      merchant = create(:merchant, name: 'Ring World')
 
       query = 'ring'
 
