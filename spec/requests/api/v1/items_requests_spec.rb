@@ -168,8 +168,8 @@ RSpec.describe 'Items endpoints' do
     it 'can destroy an item' do 
       create_list(:item, 5, merchant: @merchant)
       expect(Item.count).to eq(5)
-
-      expect{ delete "/api/v1/items/#{Item.first.id}" }.to change(Item, :count).by(-1)
+      item = Item.first
+      expect{ delete "/api/v1/items/#{item.id}" }.to change(Item, :count).by(-1)
     end
   end
 end
