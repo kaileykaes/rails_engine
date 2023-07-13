@@ -14,4 +14,22 @@ RSpec.describe Merchant, type: :model do
   describe 'validations' do 
     it {should validate_presence_of(:name)}
   end
+
+  describe 'class methods' do 
+    it 'find_it' do 
+      merchant = create(:merchant, name: 'Jeremicah Rue') 
+      create_list(:merchant, 10)
+      query = 'Jeremicah'
+      expect(Merchant.find_it(query)).to eq(merchant)
+    end
+
+    it 'find_it returns in case_insensitive alphabetical order' do 
+      merchant_2 = create(:merchant, name: 'Turing')
+      merchant = create(:merchant, name: 'Ring World')
+
+      query = 'ring'
+
+      expect(Merchant.find_it(query)).to eq(merchant)
+    end
+  end
 end
