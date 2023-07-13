@@ -162,6 +162,8 @@ RSpec.describe 'Items endpoints' do
       expect(created_item.unit_price).to eq(item_params[:unit_price])
       expect(created_item.merchant_id).to eq(item_params[:merchant_id])
     end
+
+    it 'doesnt create, throws correct error'
   end
 
   describe 'destroy' do 
