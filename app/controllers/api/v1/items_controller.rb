@@ -19,8 +19,8 @@ class Api::V1::ItemsController < ApplicationController
     item = Item.find(params[:id])
     if item.invoices.count == 1
       invoice = item.invoices.first
-      invoice.destroy if invoice.invoice_items.count == 0 
       item.destroy
+      invoice.destroy if invoice.invoice_items.count == 0 
     else
       item.destroy
     end
