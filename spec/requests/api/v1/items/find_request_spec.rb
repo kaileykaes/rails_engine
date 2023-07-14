@@ -10,6 +10,16 @@ RSpec.describe 'Find Items' do
   end
 
   describe 'search for items' do
+    it 'hits the endpoint' do 
+      query_params = {
+        name: 'bo'
+      }
+
+      get '/api/v1/items/find_all', params: query_params
+
+      expect(response).to be_successful
+    end
+
     it 'returns items by name if found' do 
       query_params = {
         name: 'bo'
@@ -17,7 +27,12 @@ RSpec.describe 'Find Items' do
 
       get '/api/v1/items/find_all', params: query_params
 
+      expect(response).to be_successful
+      json = JSON.parse(response.body, symbolize_names: true)
+
+      item = json[:data]
       require 'pry'; binding.pry
+      expect(response).to be_a Array
     end
   end
 end

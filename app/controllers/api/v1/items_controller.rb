@@ -28,7 +28,6 @@ class Api::V1::ItemsController < ApplicationController
         invoice.destroy if invoice.invoice_items.count == 0 
         item.destroy
       else
-        item.destroy
         item.invoice_items.each do |invoice_item|
           invoice_item.destroy
         end   
