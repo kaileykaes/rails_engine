@@ -31,7 +31,6 @@ RSpec.describe 'Find Items' do
       json = JSON.parse(response.body, symbolize_names: true)
 
       item = json[:data]
-      require 'pry'; binding.pry
       expect(response).to be_a Array
     end
   end
