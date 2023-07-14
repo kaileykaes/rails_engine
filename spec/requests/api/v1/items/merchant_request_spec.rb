@@ -32,10 +32,7 @@ RSpec.describe 'Item Merchant' do
       expect(merchant[:attributes][:name]).to be_a String
     end
 
-    xit 'bad integer id returns 404' do 
-      get '/api/v1/items/2/merchant' 
-      expect(response).to_not be_successful
-    end
+    it 'bad integer id returns 404' 
 
     it 'edge case, string id returns 404'
   end
