@@ -10,4 +10,12 @@ class Item < ApplicationRecord
   def self.find_some(query)
     where("name ILIKE ?", "%#{query}%").order(:name)
   end
+
+  def self.max_price
+    maximum(:unit_price)
+  end
+
+  def self.min_price
+    minimum(:unit_price)
+  end
 end
