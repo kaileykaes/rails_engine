@@ -104,7 +104,20 @@ RSpec.describe 'Merchants API' do
         expect(merchant[:attributes][:name]).to be_a String
       end
 
-      it 'bad integer returns 404'
+      it 'bad integer returns 404' do 
+        merchant = create(:merchant, id: 1)
+
+        get "/api/v1/merchants/2"
+
+        expect(response).to_not be_successful
+        expect(response.status).to eq(404)
+        
+        json = JSON.parse(response.body, symbolize_names: true)
+
+        expect(json[:errors]).to be_a(Array)
+        expect(json[:errors].first[:status]).to eq("404")
+        expect(json[:errors].first[:title]).to eq("Couldn't find Merchant with 'id'=2")
+      end
     end
   end
 end
