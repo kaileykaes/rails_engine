@@ -6,6 +6,7 @@ RSpec.describe Item, type: :model do
     it {should have_many :invoice_items}
     it {should have_many(:invoices).through(:invoice_items)}
     it {should have_many(:transactions).through(:invoices)}
+    it {should have_many(:invoice_items).dependent(:destroy)}
   end
 
   describe 'validations' do 
@@ -19,18 +20,69 @@ RSpec.describe Item, type: :model do
       @merchant = create(:merchant)
     end
 
-    it 'retrieves items based on name' do 
+    it 'find_some based on name' do 
       merchant = create(:merchant)
-      # create_list(:item, 8, merchant: @merchant)
-      item_1 = create(:item, name: 'box', merchant: @merchant)
-      item_2 = create(:item, name: 'water bottle', merchant: @merchant)
-      item_3 = create(:item, name: 'Boston red sox hat', merchant: @merchant)
-      item_4 = create(:item, name: 'car jack', merchant: @merchant)
+      box = create(:item, name: 'box', merchant: @merchant)
+      water_bottle = create(:item, name: 'water bottle', merchant: @merchant)
+      bo_sox_hat = create(:item, name: 'Boston red sox hat', merchant: @merchant)
+      car_jack = create(:item, name: 'car jack', merchant: @merchant)
 
-      query = 'bo'
+      expect(Item.find_some(name: 'bo').to_a).to eq([bo_sox_hat, box, water_bottle])
+      expect(Item.find_some(name: 'bo')).to_not include(car_jack)
+    end
 
-      expect(Item.find_some(query).to_a).to eq([item_3, item_1, item_2])
-      expect(Item.find_some(query)).to_not include(item_4)
+    it 'find_some based on unit_price min' do 
+      item_1 = create(:item, unit_price: 3.45, merchant: @merchant)
+      item_2 = create(:item, unit_price: 1.34, merchant: @merchant)
+      item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
+      item_4 = create(:item, unit_price: 8.20, merchant: @merchant)
+
+      expect(Item.find_by_price(min_price: 4.00)).to include(item_3)
+      expect(Item.find_by_price(min_price: 4.00)).to include(item_4)
+      expect(Item.find_by_price(min_price: 4.00)).to_not include(item_1)
+      expect(Item.find_by_price(min_price: 4.00)).to_not include(item_2)
+    end
+
+    it 'find_some based on unit_price max' do 
+      item_1 = create(:item, unit_price: 3.45, merchant: @merchant)
+      item_2 = create(:item, unit_price: 1.34, merchant: @merchant)
+      item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
+      item_4 = create(:item, unit_price: 8.20, merchant: @merchant)
+
+      expect(Item.find_by_price(max_price: 8.00)).to include(item_1)
+      expect(Item.find_by_price(max_price: 8.00)).to include(item_2)
+      expect(Item.find_by_price(max_price: 8.00)).to include(item_3)
+      expect(Item.find_by_price(max_price: 8.00)).to_not include(item_4)
+    end
+
+    it 'find_some based on range' do 
+      item_1 = create(:item, unit_price: 3.45, merchant: @merchant)
+      item_2 = create(:item, unit_price: 1.34, merchant: @merchant)
+      item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
+      item_4 = create(:item, unit_price: 8.20, merchant: @merchant)
+
+      expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to include(item_3)
+      expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to_not include(item_1)
+      expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to_not include(item_2)
+      expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to_not include(item_4)
+    end
+
+    it 'find_some but no result' do 
+      # expect(Item.find_some(name: '')).to eq(nil)
+      expect(Item.find_some(min_price: nil)).to eq(nil)
+      expect(Item.find_some(max_price: nil)).to eq(nil)
+      expect(Item.find_some(min_price: nil, max_price: nil)).to eq(nil)
+    end
+
+    it '#find_name based on name' do 
+      merchant = create(:merchant)
+      box = create(:item, name: 'box', merchant: @merchant)
+      water_bottle = create(:item, name: 'water bottle', merchant: @merchant)
+      bo_sox_hat = create(:item, name: 'Boston red sox hat', merchant: @merchant)
+      car_jack = create(:item, name: 'car jack', merchant: @merchant)
+
+      expect(Item.find_name('bo').to_a).to eq([bo_sox_hat, box, water_bottle])
+      expect(Item.find_name('bo')).to_not include(car_jack)
     end
 
     it 'retrieves items based on max_price' do 
@@ -38,8 +90,6 @@ RSpec.describe Item, type: :model do
       item_2 = create(:item, unit_price: 1.34, merchant: @merchant)
       item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
       item_4 = create(:item, unit_price: 8.20, merchant: @merchant)
-
-      # query = {max_price: 8.00}
 
       expect(Item.find_by_price(max_price: 8.00)).to include(item_1)
       expect(Item.find_by_price(max_price: 8.00)).to include(item_2)
@@ -53,8 +103,6 @@ RSpec.describe Item, type: :model do
       item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
       item_4 = create(:item, unit_price: 8.20, merchant: @merchant)
 
-      # query = {min_price: 4.00}
-
       expect(Item.find_by_price(min_price: 4.00)).to include(item_3)
       expect(Item.find_by_price(min_price: 4.00)).to include(item_4)
       expect(Item.find_by_price(min_price: 4.00)).to_not include(item_1)
@@ -67,28 +115,10 @@ RSpec.describe Item, type: :model do
       item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
       item_4 = create(:item, unit_price: 8.20, merchant: @merchant)
 
-      # query = {min_price: 4.00, max_price: 8.00}
-
       expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to include(item_3)
       expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to_not include(item_1)
       expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to_not include(item_2)
       expect(Item.find_by_price(min_price: 4.00, max_price: 8.00)).to_not include(item_4)
     end
-
-    # it '#max_price' do 
-    #   item_1 = create(:item, unit_price: 3.45, merchant: @merchant)
-    #   item_2 = create(:item, unit_price: 1.34, merchant: @merchant)
-    #   item_3 = create(:item, unit_price: 8.20, merchant: @merchant)
-
-    #   expect(Item.max_price).to eq(8.20)
-    # end
-
-    # it '#min_price' do 
-    #   item_1 = create(:item, unit_price: 3.45, merchant: @merchant)
-    #   item_2 = create(:item, unit_price: 1.34, merchant: @merchant)
-    #   item_3 = create(:item, unit_price: 7.98, merchant: @merchant)
-      
-    #   expect(Item.min_price).to eq(1.34)
-    # end
   end
 end
