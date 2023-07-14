@@ -4,7 +4,7 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def show
-    render json: ItemSerializer.new(Item.find(params[:id]))
+    response = render json: ItemSerializer.new(Item.find(params[:id]))
   end
 
   def create
@@ -12,28 +12,17 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def update
-    render json: (ItemSerializer.new(Item.update!(item_params))) 
+    render json: (ItemSerializer.new(Item.update!(params[:id], item_params))) 
   end
 
   def destroy
     item = Item.find(params[:id])
-    begin
+    if item.invoices.count == 1
+      invoice = item.invoices.first
       item.destroy
-    rescue ActiveRecord::InvalidForeignKey => e
-      if item.invoices.count == 1
-        invoice = item.invoices.first
-        item.invoice_items.each do |invoice_item|
-          invoice_item.destroy
-        end
-        invoice.destroy if invoice.invoice_items.count == 0 
-        item.destroy
-      else
-        item.destroy
-        item.invoice_items.each do |invoice_item|
-          invoice_item.destroy
-        end   
-        item.destroy
-      end
+      invoice.destroy if invoice.invoice_items.count == 0 
+    else
+      item.destroy
     end
   end
 

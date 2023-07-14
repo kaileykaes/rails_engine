@@ -184,7 +184,7 @@ RSpec.describe 'Items endpoints' do
       patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate(item: item_params)
       
       json = JSON.parse(response.body, symbolize_names: true)
-      item_data = json[:data].first
+      item_data = json[:data]
 
       item = Item.find(item_data[:id])
 
@@ -207,7 +207,7 @@ RSpec.describe 'Items endpoints' do
       patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate(item: item_params)
       
       json = JSON.parse(response.body, symbolize_names: true)
-      item_data = json[:data].first
+      item_data = json[:data]
 
       item = Item.find(item_data[:id])
 

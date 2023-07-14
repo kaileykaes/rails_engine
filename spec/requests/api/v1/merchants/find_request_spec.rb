@@ -40,5 +40,7 @@ RSpec.describe 'Find a Merchant' do
       expect(merchant[:type]).to eq('merchant')
       expect(merchant[:id]).to eq("#{merchant_2.id}")
     end
+
+    it 'no fragment matched, still sends object' 
   end
 end

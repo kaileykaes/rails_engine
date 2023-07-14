@@ -47,9 +47,6 @@ RSpec.describe 'Merchant Items' do
       end
     end
 
-    xit 'bad integer id returns 404' do 
-      get '/api/v1/merchants/2/items' 
-      expect(response).to_not be_successful
-    end
+    it 'bad integer id returns 404' 
   end
 end
